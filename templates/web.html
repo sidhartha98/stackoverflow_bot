@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<link rel="stylesheet" type="text/css" href="/static/design2.css">
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+		<script src="//code.jquery.com/jquery.min.js"></script>
+		<script src="replace_anchor_links.min.js"></script>
+
+	</head>
+	<body>
+		<p class="card" style="margin-top: 4%;margin-left: 4%;">This project aims at creating a chatbot which will help students and developers for diagnosing the issue faced by them while coding.</p>
+		<div class="mainbox">
+			<h1>STACKOVERFLOW BOT</h1>
+			<div>
+				<div id="chatbox">
+					<p class="cardbot"><span>Hi! I'm StackBot.</span></p>
+				</div>
+					
+				<div id="userInput">
+					<input id="textInput" type="text" name="msg" placeholder="Message">
+					<input id="buttonInput" type="submit" value="Send">
+				</div>
+				
+			</div>
+		</div>
+	</body>
+</html>
+<script>
+	function getBotResponse() 
+	{
+		var pattern = /^((http|https|ftp):\/\/)/;
+		var rawText = $("#textInput").val();
+		var userHtml = '<p class="cardUser"><span>' + rawText + '</span></p>';
+		$("#textInput").val("");
+		$("#chatbox").append(userHtml);
+		document.getElementById('userInput').scrollIntoView({block: 'start', behavior: 'smooth'});
+		$.get("/get", { msg: rawText }).done(function(data) {
+			var res = data.split("||");
+			if (!pattern.test(res[0])) {
+				var botHtml = '<p class="cardbot"><span>' + res[0] + '</span></p>';
+				$("#chatbox").append(botHtml);
+				document.getElementById('userInput').scrollIntoView({block: 'start', behavior: 'smooth'});
+			}
+			if (pattern.test(res[1])) {
+				var botHtml = '<p class="cardbot"><span>' + "I think the following link might help you " + res[1].link(res[1]) + "."+'</span></p>';
+				$("#chatbox").append(botHtml);
+				document.getElementById('userInput').scrollIntoView({block: 'start', behavior: 'smooth'});
+			}
+		});
+	}
+	$("#textInput").keypress(function(e) {
+	if(e.which == 13) {
+		getBotResponse();
+	}
+	});
+	$("#buttonInput").click(function() {
+		// if($(".cardUser span").val() != "")
+			getBotResponse();
+	})
+</script>
